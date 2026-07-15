@@ -1,0 +1,31 @@
+/** JSON Schema for vLLM constrained decoding (Tier 2). Mirrors schemas/scene-spec.v1.json. */
+export const SCENE_SPEC_JSON_SCHEMA = {
+  $schema: 'http://json-schema.org/draft-07/schema#',
+  $id: 'https://animagen.dev/schemas/scene-spec/v1.json',
+  title: 'SceneSpec',
+  type: 'object',
+  required: [
+    'version',
+    'seed',
+    'prompt',
+    'subjects',
+    'environment',
+    'lighting',
+    'animations',
+    'camera',
+    'effects',
+  ],
+  additionalProperties: false,
+  properties: {
+    version: { type: 'integer', const: 1 },
+    seed: { type: 'integer', minimum: 0 },
+    prompt: { type: 'string', minLength: 1, maxLength: 2000 },
+    subjects: { type: 'array', maxItems: 20 },
+    environment: { type: 'string' },
+    lighting: { type: 'object' },
+    animations: { type: 'array', maxItems: 30 },
+    camera: { type: 'object' },
+    effects: { type: 'array', maxItems: 10 },
+    metadata: { type: 'object' },
+  },
+} as const;
