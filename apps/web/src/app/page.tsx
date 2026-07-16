@@ -1,20 +1,18 @@
-import { createDefaultSceneSpec } from '@animagen/scene-schema';
+import Link from 'next/link';
 
 export default function HomePage() {
-  const placeholder = createDefaultSceneSpec({
-    prompt: 'Animagen scaffold — Phase 1 complete',
-    seed: 0,
-  });
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 p-8">
-      <h1 className="text-4xl font-bold tracking-tight text-animagen-100">Animagen</h1>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-zinc-950 p-8 text-zinc-100">
+      <h1 className="text-4xl font-bold">Animagen</h1>
       <p className="max-w-lg text-center text-zinc-400">
-        Production-grade 3D animation from text prompts. Monorepo scaffold ready.
+        Production-grade 3D animation from text prompts.
       </p>
-      <pre className="rounded-lg border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-300">
-        {JSON.stringify(placeholder, null, 2)}
-      </pre>
+      <Link
+        href="/demo"
+        className="rounded-lg bg-indigo-600 px-6 py-3 font-medium hover:bg-indigo-500"
+      >
+        Open Engine Demo (Phase 3)
+      </Link>
     </main>
   );
 }

@@ -1,12 +1,10 @@
-import type { SceneSpec } from '@animagen/scene-schema';
-import type * as THREE from 'three';
-
-export interface SceneBuildResult {
-  scene: THREE.Scene;
-  dispose: () => void;
-}
-
-/** Placeholder — implemented in Phase 3. */
-export function buildSceneFromSpec(_spec: SceneSpec): SceneBuildResult {
-  throw new Error('buildSceneFromSpec not implemented — see Phase 3');
-}
+export { buildSceneFromSpec } from './build-scene.js';
+export type { SceneBuildOptions, SceneBuildResult } from './build-scene.js';
+export { SeededRandom } from './rng.js';
+export { ALL_SUBJECT_TYPES, buildSubject } from './subjects/index.js';
+export { buildEnvironment } from './environments/index.js';
+export { buildEffect, buildEffects } from './effects/index.js';
+export { createCamera, createCameraController } from './camera/index.js';
+export type { CameraController } from './camera/index.js';
+export { parseColor, createStandardMaterial } from './colors.js';
+export { buildLighting, applyLightingToScene } from './lighting.js';

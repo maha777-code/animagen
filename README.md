@@ -48,8 +48,8 @@ pnpm dev          # All packages via Turbo
 | Phase | Description | Status |
 |-------|-------------|--------|
 | 1 | Monorepo scaffold + SceneSpec schema | ✅ |
-| 2 | Rule-based parser + tests | Pending |
-| 3 | Procedural Three.js engine | Pending |
+| 2 | Rule-based parser + tests | ✅ |
+| 3 | Procedural Three.js engine | ✅ |
 | 4 | Web app (render, export, controls) | Pending |
 | 5 | Backend API + vLLM worker | Pending |
 | 6 | Infra (Docker, k8s, k6) | Pending |
