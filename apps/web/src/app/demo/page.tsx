@@ -2,6 +2,7 @@
 
 import { ALL_SUBJECT_TYPES } from '@animagen/engine';
 import type { EnvironmentType } from '@animagen/scene-schema';
+import Link from 'next/link';
 import { useState } from 'react';
 import { DemoCanvas } from '../../components/demo/DemoCanvas';
 
@@ -31,8 +32,18 @@ export default function DemoPage() {
   return (
     <main className="min-h-screen bg-zinc-950 p-6 text-zinc-100">
       <div className="mx-auto max-w-6xl">
-        <h1 className="mb-2 text-3xl font-bold">Animagen Engine Demo</h1>
-        <p className="mb-6 text-zinc-400">Phase 3 — procedural subjects, environments, and effects</p>
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="mb-2 text-3xl font-bold">Animagen Engine Demo</h1>
+            <p className="text-zinc-400">Phase 3 — browse procedural subjects and environments</p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium hover:bg-indigo-500"
+          >
+            ← Open Phase 4 Studio
+          </Link>
+        </div>
 
         <div className="mb-4 flex gap-2">
           <button

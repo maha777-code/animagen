@@ -50,7 +50,7 @@ pnpm dev          # All packages via Turbo
 | 1 | Monorepo scaffold + SceneSpec schema | ✅ |
 | 2 | Rule-based parser + tests | ✅ |
 | 3 | Procedural Three.js engine | ✅ |
-| 4 | Web app (render, export, controls) | Pending |
+| 4 | Web app (render, export, controls) | ✅ |
 | 5 | Backend API + vLLM worker | Pending |
 | 6 | Infra (Docker, k8s, k6) | Pending |
 
