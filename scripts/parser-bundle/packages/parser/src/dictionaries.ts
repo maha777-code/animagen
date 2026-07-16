@@ -1,0 +1,119 @@
+import type {
+  CameraMovement,
+  EffectType,
+  EnvironmentType,
+  MotionType,
+  Mood,
+  PathType,
+  SubjectType,
+  TimeOfDay,
+} from '@animagen/scene-schema';
+
+/** Confidence below this triggers Tier 2 LLM fallback. */
+export const PARSER_CONFIDENCE_THRESHOLD = 0.35;
+
+export const COLOR_WORDS: readonly string[] = [
+  'red', 'blue', 'green', 'yellow', 'orange', 'purple', 'violet', 'pink', 'white', 'black',
+  'gold', 'golden', 'silver', 'bronze', 'cyan', 'teal', 'crimson', 'scarlet', 'emerald',
+  'azure', 'indigo', 'maroon', 'beige', 'turquoise', 'magenta', 'lavender', 'amber',
+  'ivory', 'charcoal', 'coral', 'lime', 'navy', 'rust', 'copper',
+];
+
+export const COUNT_WORDS: Record<string, number> = {
+  a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8,
+  nine: 9, ten: 10, couple: 2, few: 3, several: 4, many: 5, dozen: 12,
+};
+
+export const SUBJECT_SYNONYMS: Readonly<Record<string, SubjectType>> = {
+  spaceship: 'spaceship', spacecraft: 'spaceship', starship: 'spaceship', spaceships: 'spaceship',
+  airplane: 'airplane', aeroplane: 'airplane', aeroplanes: 'airplane', airplanes: 'airplane',
+  butterfly: 'butterfly', butterflies: 'butterfly', mountain: 'mountain', mountains: 'mountain',
+  dragon: 'dragon', dragons: 'dragon', wyrm: 'dragon', drake: 'dragon',
+  bird: 'bird', birds: 'bird', eagle: 'bird', hawk: 'bird', owl: 'bird', raven: 'bird', sparrow: 'bird', falcon: 'bird',
+  fish: 'fish', fishes: 'fish', salmon: 'fish', shark: 'fish',
+  automobile: 'car', vehicle: 'car', car: 'car', cars: 'car', sedan: 'car', truck: 'car',
+  robot: 'robot', robots: 'robot', android: 'robot', cyborg: 'robot', mech: 'robot',
+  human: 'human', person: 'human', figure: 'human', knight: 'human', warrior: 'human', man: 'human', woman: 'human',
+  tree: 'tree', trees: 'tree', oak: 'tree', pine: 'tree',
+  planet: 'planet', planets: 'planet', globe: 'planet', mars: 'planet', earth: 'planet', ufo: 'spaceship',
+  whale: 'whale', whales: 'whale', orca: 'whale', dolphin: 'whale',
+  horse: 'horse', horses: 'horse', stallion: 'horse', pony: 'horse',
+  cat: 'cat', cats: 'cat', kitten: 'cat', dog: 'dog', dogs: 'dog', puppy: 'dog',
+  snake: 'snake', snakes: 'snake', serpent: 'snake', viper: 'snake',
+  cube: 'cube', cubes: 'cube', box: 'cube', sphere: 'sphere', spheres: 'sphere', ball: 'sphere', orb: 'sphere',
+  flower: 'flower', flowers: 'flower', rose: 'flower', tulip: 'flower', blossom: 'flower',
+  house: 'house', cottage: 'house', home: 'house', building: 'house',
+  sailboat: 'boat', yacht: 'boat', boat: 'boat', boats: 'boat', ship: 'boat', ships: 'boat',
+  plane: 'airplane', planes: 'airplane', jet: 'airplane',
+  rocket: 'rocket', rockets: 'rocket', missile: 'rocket',
+  cloud: 'cloud', clouds: 'cloud', crystal: 'crystal', crystals: 'crystal', gem: 'crystal', diamond: 'crystal',
+};
+
+export const ENVIRONMENT_SYNONYMS: Readonly<Record<string, EnvironmentType>> = {
+  ocean: 'ocean', sea: 'ocean', marine: 'ocean', underwater: 'underwater', reef: 'underwater', coral: 'underwater',
+  forest: 'forest', woods: 'forest', woodland: 'forest', grove: 'forest',
+  desert: 'desert', dunes: 'desert', sahara: 'desert',
+  space: 'space', cosmos: 'space', galaxy: 'space', universe: 'space', void: 'space',
+  city: 'city', urban: 'city', downtown: 'city', metropolis: 'city', street: 'city', streets: 'city',
+  mountains: 'mountains', alpine: 'mountains', peaks: 'mountains', hills: 'mountains',
+  meadow: 'meadow', field: 'meadow', grassland: 'meadow', prairie: 'meadow',
+  volcano: 'volcano', lava: 'volcano', volcanic: 'volcano',
+  arctic: 'arctic', tundra: 'arctic', polar: 'arctic', frozen: 'arctic', ice: 'arctic',
+  cave: 'cave', cavern: 'cave', grotto: 'cave', sky: 'sky', heavens: 'sky',
+  beach: 'beach', shore: 'beach', coastline: 'beach', sand: 'beach',
+  jungle: 'jungle', rainforest: 'jungle', tropics: 'jungle',
+};
+
+export const TIME_OF_DAY_SYNONYMS: Readonly<Record<string, TimeOfDay>> = {
+  dawn: 'dawn', daybreak: 'dawn', sunrise: 'dawn', morning: 'morning', noon: 'noon', midday: 'noon',
+  afternoon: 'afternoon', sunset: 'sunset', dusk: 'dusk', twilight: 'dusk',
+  night: 'night', nighttime: 'night', moonlit: 'night', midnight: 'midnight',
+};
+
+export const MOOD_SYNONYMS: Readonly<Record<string, Mood>> = {
+  calm: 'calm', serene: 'calm', tranquil: 'calm', dramatic: 'dramatic', intense: 'dramatic',
+  mysterious: 'mysterious', enigmatic: 'mysterious', cheerful: 'cheerful', happy: 'cheerful', joyful: 'cheerful', bright: 'cheerful',
+  dark: 'dark', ominous: 'dark', gloomy: 'dark', epic: 'epic', grand: 'epic', majestic: 'epic', heroic: 'epic',
+  peaceful: 'peaceful', relaxing: 'peaceful', quiet: 'peaceful', stormy: 'stormy', turbulent: 'stormy', chaotic: 'stormy',
+  romantic: 'romantic', dreamy: 'romantic', eerie: 'eerie', creepy: 'eerie', spooky: 'eerie', haunted: 'eerie',
+};
+
+export const MOTION_SYNONYMS: Readonly<Record<string, MotionType>> = {
+  fly: 'fly', flying: 'fly', flies: 'fly', flew: 'fly', soar: 'fly', soaring: 'fly', gliding: 'fly', glide: 'fly',
+  walk: 'walk', walking: 'walk', walks: 'walk', stroll: 'walk', strolling: 'walk', driving: 'walk', slithering: 'walk',
+  launch: 'fly', launching: 'fly', swim: 'swim', swimming: 'swim', swims: 'swim',
+  bounce: 'bounce', bouncing: 'bounce', bounces: 'bounce', spin: 'spin', spinning: 'spin', rotates: 'spin', rotating: 'spin',
+  float: 'float', floating: 'float', drift: 'float', drifting: 'float', idle: 'idle', motionless: 'idle',
+  run: 'run', running: 'run', runs: 'run', sprint: 'run', sprinting: 'run',
+  dive: 'dive', diving: 'dive', plunges: 'dive', hover: 'hover', hovering: 'hover', levitate: 'hover', levitating: 'hover',
+  patrol: 'patrol', patrolling: 'patrol', orbit: 'orbit', orbiting: 'orbit',
+  wave: 'wave', waving: 'wave', pulse: 'pulse', pulsing: 'pulse', grow: 'grow', growing: 'grow', expands: 'grow',
+};
+
+export const PATH_SYNONYMS: Readonly<Record<string, PathType>> = {
+  circle: 'circle', circles: 'circle', circular: 'circle', round: 'circle',
+  figure8: 'figure8', 'figure-8': 'figure8', line: 'line', straight: 'line', sine: 'sine', wave: 'sine',
+  spiral: 'spiral', random: 'random', wandering: 'random', spline: 'spline',
+};
+
+export const EFFECT_SYNONYMS: Readonly<Record<string, EffectType>> = {
+  rain: 'rain', raining: 'rain', rainy: 'rain', drizzle: 'rain', snow: 'snow', snowing: 'snow', snowy: 'snow', blizzard: 'snow',
+  fog: 'fog', foggy: 'fog', mist: 'fog', misty: 'fog', haze: 'fog', fire: 'fire', flames: 'fire', burning: 'fire', blaze: 'fire',
+  sparkles: 'sparkles', glitter: 'sparkles', shimmer: 'sparkles', storm: 'storm', stormy: 'storm', tempest: 'storm', thunder: 'storm',
+  lightning: 'lightning', bolts: 'lightning', bubbles: 'bubbles', bubbling: 'bubbles', dust: 'dust', dusty: 'dust', leaves: 'leaves', autumn: 'leaves',
+};
+
+export const CAMERA_PHRASES: Readonly<Record<string, CameraMovement>> = {
+  'fly through': 'flythrough', flythrough: 'flythrough', 'fly-through': 'flythrough', aerial: 'flythrough', cinematic: 'flythrough',
+  follow: 'follow', following: 'follow', tracks: 'follow', tracking: 'follow',
+  static: 'static', fixed: 'static', orbit: 'orbit', orbiting: 'orbit',
+};
+
+export const SPEED_MODIFIERS: Readonly<Record<string, number>> = {
+  slowly: 0.5, slow: 0.5, gently: 0.6, fast: 2, quickly: 2, rapid: 2.5, rapidly: 2.5,
+};
+
+export const SKIP_WORDS: ReadonlySet<string> = new Set([
+  'a', 'an', 'the', 'of', 'with', 'and', 'in', 'on', 'at', 'over', 'under', 'through', 'across', 'into', 'from', 'to', 'by',
+  'near', 'above', 'below', 'around', 'about', 'very', 'small', 'large', 'big', 'tiny', 'giant', 'massive',
+]);
