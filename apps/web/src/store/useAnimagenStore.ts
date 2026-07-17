@@ -15,6 +15,7 @@ interface AnimagenState {
   orbitMode: boolean;
   playbackKey: number;
   parseError: string | null;
+  hydrated: boolean;
   setPrompt: (prompt: string) => void;
   generate: () => void;
   rerollSeed: () => void;
@@ -22,6 +23,7 @@ interface AnimagenState {
   togglePlaying: () => void;
   setOrbitMode: (orbitMode: boolean) => void;
   restartPlayback: () => void;
+  hydrate: () => void;
 }
 
 function parseWithSeed(prompt: string, seed: number) {
@@ -35,25 +37,24 @@ function parseWithSeed(prompt: string, seed: number) {
   };
 }
 
-const initialParsed = (() => {
-  try {
-    return parseWithSeed(DEFAULT_PROMPT, seedFromPrompt(DEFAULT_PROMPT));
-  } catch {
-    return null;
-  }
-})();
-
 export const useAnimagenStore = create<AnimagenState>((set, get) => ({
   prompt: DEFAULT_PROMPT,
-  seed: initialParsed?.seed ?? null,
-  spec: initialParsed?.spec ?? null,
-  confidence: initialParsed?.confidence ?? 0,
-  matchedEntities: initialParsed?.matchedEntities ?? [],
-  needsLlmFallback: initialParsed?.needsLlmFallback ?? false,
+  seed: null,
+  spec: null,
+  confidence: 0,
+  matchedEntities: [],
+  needsLlmFallback: false,
   isPlaying: true,
   orbitMode: false,
   playbackKey: 0,
   parseError: null,
+  hydrated: false,
+
+  hydrate: () => {
+    if (get().hydrated) return;
+    set({ hydrated: true });
+    get().generate();
+  },
 
   setPrompt: (prompt) => set({ prompt }),
 

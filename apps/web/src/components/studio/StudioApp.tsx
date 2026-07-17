@@ -1,21 +1,39 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useAnimagenStore } from '../../store/useAnimagenStore';
 import { ExportPanel } from './ExportPanel';
 import { PlaybackControls } from './PlaybackControls';
 import { PromptBar } from './PromptBar';
-import { SceneCanvas, type SceneCanvasHandle } from './SceneCanvas';
 import { SpecPanel } from './SpecPanel';
+
+const SceneCanvas = dynamic(() => import('./SceneCanvas').then((m) => m.SceneCanvas), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full items-center justify-center rounded-lg bg-zinc-900 text-zinc-500">
+      Loading 3D preview…
+    </div>
+  ),
+});
 
 export function StudioApp() {
   const spec = useAnimagenStore((s) => s.spec);
+  const hydrated = useAnimagenStore((s) => s.hydrated);
   const isPlaying = useAnimagenStore((s) => s.isPlaying);
   const orbitMode = useAnimagenStore((s) => s.orbitMode);
   const playbackKey = useAnimagenStore((s) => s.playbackKey);
+  const hydrate = useAnimagenStore((s) => s.hydrate);
 
-  const canvasRef = useRef<SceneCanvasHandle>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    hydrate();
+  }, [hydrate]);
+
+  const showCanvas = mounted && hydrated && spec;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -35,9 +53,8 @@ export function StudioApp() {
         <div className="flex flex-col gap-4">
           <PromptBar />
           <div className="h-[min(60vh,560px)] min-h-[320px]">
-            {spec ? (
+            {showCanvas ? (
               <SceneCanvas
-                ref={canvasRef}
                 key={`${spec.seed}-${playbackKey}`}
                 spec={spec}
                 isPlaying={isPlaying}
@@ -46,7 +63,7 @@ export function StudioApp() {
               />
             ) : (
               <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-zinc-700 text-zinc-500">
-                Generate a scene to begin
+                Loading studio…
               </div>
             )}
           </div>
@@ -55,7 +72,7 @@ export function StudioApp() {
         <aside className="flex flex-col gap-4">
           <SpecPanel />
           <PlaybackControls />
-          <ExportPanel canvasRef={canvasRef} />
+          <ExportPanel />
         </aside>
       </main>
     </div>

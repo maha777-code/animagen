@@ -4,15 +4,8 @@ import { OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { buildSceneFromSpec, type SceneBuildResult } from '@animagen/engine';
 import type { SceneSpec } from '@animagen/scene-schema';
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
-import { exportObjectToGlb } from '../../lib/export-glb';
-import { recordCanvasAnimation } from '../../lib/export-video';
-
-export interface SceneCanvasHandle {
-  exportGlb: () => Promise<Blob>;
-  exportVideo: (onProgress?: (ratio: number) => void) => Promise<Blob>;
-}
 
 interface SceneCanvasProps {
   spec: SceneSpec;
@@ -83,59 +76,8 @@ function SceneContent({
   );
 }
 
-export const SceneCanvas = forwardRef<SceneCanvasHandle, SceneCanvasProps>(function SceneCanvas(
-  { spec, isPlaying, orbitMode, playbackKey },
-  ref,
-) {
+export function SceneCanvas({ spec, isPlaying, orbitMode, playbackKey }: SceneCanvasProps) {
   const buildRef = useRef<SceneBuildResult | null>(null);
-
-  useImperativeHandle(ref, () => ({
-    async exportGlb() {
-      const built = buildRef.current;
-      if (!built) throw new Error('Scene is not ready');
-
-      const exportRoot = new THREE.Group();
-      built.scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          exportRoot.add(obj.clone());
-        }
-      });
-      return exportObjectToGlb(exportRoot);
-    },
-
-    async exportVideo(onProgress) {
-      const width = 1280;
-      const height = 720;
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-
-      const renderer = new THREE.WebGLRenderer({
-        canvas,
-        antialias: true,
-        preserveDrawingBuffer: true,
-      });
-      renderer.setSize(width, height, false);
-
-      const built = buildSceneFromSpec(spec, { aspect: width / height });
-      const duration = spec.camera.duration ?? 10;
-
-      try {
-        return await recordCanvasAnimation({
-          canvas,
-          durationSec: duration,
-          onProgress,
-          onFrame: (delta) => {
-            built.update(delta);
-            renderer.render(built.scene, built.camera);
-          },
-        });
-      } finally {
-        built.dispose();
-        renderer.dispose();
-      }
-    },
-  }));
 
   return (
     <Canvas
@@ -153,4 +95,4 @@ export const SceneCanvas = forwardRef<SceneCanvasHandle, SceneCanvasProps>(funct
       />
     </Canvas>
   );
-});
+}

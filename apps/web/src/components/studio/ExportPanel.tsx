@@ -1,15 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { downloadBlob } from '../../lib/export-glb';
+import { downloadBlob } from '../../lib/download';
 import { useAnimagenStore } from '../../store/useAnimagenStore';
-import type { SceneCanvasHandle } from './SceneCanvas';
 
-interface ExportPanelProps {
-  canvasRef: React.RefObject<SceneCanvasHandle | null>;
-}
-
-export function ExportPanel({ canvasRef }: ExportPanelProps) {
+export function ExportPanel() {
   const spec = useAnimagenStore((s) => s.spec);
   const [busy, setBusy] = useState<'glb' | 'video' | null>(null);
   const [progress, setProgress] = useState(0);
@@ -18,11 +13,12 @@ export function ExportPanel({ canvasRef }: ExportPanelProps) {
   const slug = useRef(0);
 
   const handleGlb = async () => {
-    if (!canvasRef.current || !spec) return;
+    if (!spec) return;
     setBusy('glb');
     setError(null);
     try {
-      const blob = await canvasRef.current.exportGlb();
+      const { exportSpecToGlb } = await import('../../lib/scene-export');
+      const blob = await exportSpecToGlb(spec);
       slug.current += 1;
       downloadBlob(blob, `animagen-${spec.seed}-${slug.current}.glb`);
     } catch (err) {
@@ -33,12 +29,13 @@ export function ExportPanel({ canvasRef }: ExportPanelProps) {
   };
 
   const handleVideo = async () => {
-    if (!canvasRef.current || !spec) return;
+    if (!spec) return;
     setBusy('video');
     setError(null);
     setProgress(0);
     try {
-      const blob = await canvasRef.current.exportVideo(setProgress);
+      const { exportSpecToVideo } = await import('../../lib/scene-export');
+      const blob = await exportSpecToVideo(spec, setProgress);
       slug.current += 1;
       downloadBlob(blob, `animagen-${spec.seed}-${slug.current}.webm`);
     } catch (err) {

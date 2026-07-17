@@ -21,12 +21,3 @@ export async function exportObjectToGlb(root: THREE.Object3D): Promise<Blob> {
 
   return new Blob([buffer], { type: 'model/gltf-binary' });
 }
-
-export function downloadBlob(blob: Blob, filename: string): void {
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = filename;
-  anchor.click();
-  URL.revokeObjectURL(url);
-}
