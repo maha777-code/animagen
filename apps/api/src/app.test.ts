@@ -39,4 +39,33 @@ describe('@animagen/api', () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
+  it('POST /api/generate with forceLlm uses separate cache from parser', async () => {
+    const app = buildApp();
+    const payload = { prompt: 'a red dragon flying over the ocean at sunset', seed: 42 };
+
+    const parserRes = await app.inject({
+      method: 'POST',
+      url: '/api/generate',
+      payload,
+    });
+    expect(parserRes.statusCode).toBe(200);
+    const parserBody = parserRes.json() as { tier: string; spec: { metadata?: { source?: string } } };
+    expect(parserBody.tier).toBe('parser');
+    expect(parserBody.spec.metadata?.source).toBe('parser');
+
+    const enhanceRes = await app.inject({
+      method: 'POST',
+      url: '/api/generate',
+      payload: { ...payload, forceLlm: true },
+    });
+    expect(enhanceRes.statusCode).toBe(200);
+    const enhanceBody = enhanceRes.json() as {
+      tier: string;
+      spec: { metadata?: { source?: string } };
+    };
+    expect(enhanceBody.tier).not.toBe('cache');
+    expect(['enhanced', 'llm']).toContain(enhanceBody.tier);
+    expect(enhanceBody.spec.metadata?.source).not.toBe('parser');
+  });
 });

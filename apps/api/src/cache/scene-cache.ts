@@ -59,6 +59,8 @@ export function createSceneCache(redisUrl: string): SceneCache {
   return new MemorySceneCache();
 }
 
-export function cacheKey(normalizedPrompt: string, seed: number): string {
-  return `${normalizedPrompt}:${seed}`;
+export type CacheMode = 'standard' | 'enhance';
+
+export function cacheKey(normalizedPrompt: string, seed: number, mode: CacheMode = 'standard'): string {
+  return mode === 'enhance' ? `${normalizedPrompt}:${seed}:enhance` : `${normalizedPrompt}:${seed}`;
 }

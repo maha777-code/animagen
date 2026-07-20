@@ -30,7 +30,8 @@ export async function generateScene(
   }
 
   const seed = input.seed ?? seedFromPrompt(prompt);
-  const key = cacheKey(normalizePrompt(prompt), seed);
+  const cacheMode = input.forceLlm ? 'enhance' : 'standard';
+  const key = cacheKey(normalizePrompt(prompt), seed, cacheMode);
 
   const cached = await cache.get(key);
   if (cached) {
@@ -76,7 +77,7 @@ export async function generateScene(
       prompt,
       metadata: {
         ...inference.spec.metadata,
-        source: inference.source === 'llm' ? 'llm' : 'fallback',
+        source: inference.source === 'llm' ? 'llm' : 'enhanced',
         confidence: Math.max(parsed.confidence, inference.source === 'llm' ? 0.85 : 0.65),
         normalizedPrompt: normalizePrompt(prompt),
         generatedAt: new Date().toISOString(),
