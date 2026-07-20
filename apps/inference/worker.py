@@ -1,16 +1,9 @@
-"""Animagen vLLM inference worker — placeholder for Phase 5."""
+"""CLI entry — run inference HTTP server."""
 
-from __future__ import annotations
-
-import json
-import os
-from typing import Any
-
-
-def generate_scene_spec(prompt: str) -> dict[str, Any]:
-    """Generate SceneSpec JSON from prompt via self-hosted LLM."""
-    raise NotImplementedError("Implemented in Phase 5 with vLLM + JSON schema mode")
-
+from server import app  # noqa: F401
 
 if __name__ == "__main__":
-    print(json.dumps({"status": "inference worker scaffold ready"}))
+    import uvicorn
+    import os
+
+    uvicorn.run("server:app", host="0.0.0.0", port=int(os.getenv("INFERENCE_PORT", "8000")))

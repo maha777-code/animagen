@@ -2,17 +2,26 @@
 
 import { useAnimagenStore } from '../../store/useAnimagenStore';
 
+const TIER_LABELS: Record<string, string> = {
+  cache: 'Cached',
+  parser: 'Tier 1 Parser',
+  llm: 'Tier 2 LLM',
+  enhanced: 'Tier 2 Enhanced',
+  local: 'Browser fallback',
+};
+
 export function SpecPanel() {
   const spec = useAnimagenStore((s) => s.spec);
   const confidence = useAnimagenStore((s) => s.confidence);
   const matchedEntities = useAnimagenStore((s) => s.matchedEntities);
   const needsLlmFallback = useAnimagenStore((s) => s.needsLlmFallback);
+  const tier = useAnimagenStore((s) => s.tier);
   const seed = useAnimagenStore((s) => s.seed);
 
   if (!spec) {
     return (
       <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4 text-sm text-zinc-500">
-        Enter a prompt and click Generate to parse and preview your scene.
+        Enter a prompt and click Generate to build your scene via the API.
       </div>
     );
   }
@@ -24,14 +33,19 @@ export function SpecPanel() {
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-400">Scene spec</h2>
 
       <div className="mb-3 flex flex-wrap gap-2 text-xs">
+        {tier ? (
+          <span className="rounded bg-indigo-900/80 px-2 py-1 text-indigo-200">
+            {TIER_LABELS[tier] ?? tier}
+          </span>
+        ) : null}
         <span className="rounded bg-zinc-800 px-2 py-1">Seed: {seed ?? spec.seed}</span>
         <span className="rounded bg-zinc-800 px-2 py-1">Confidence: {confidencePct}%</span>
         <span className="rounded bg-zinc-800 px-2 py-1 capitalize">Env: {spec.environment}</span>
       </div>
 
-      {needsLlmFallback ? (
+      {needsLlmFallback && tier === 'local' ? (
         <p className="mb-3 rounded-lg border border-amber-700/50 bg-amber-950/40 px-3 py-2 text-xs text-amber-200">
-          Low parser confidence — Tier 2 LLM fallback would be used in Phase 5.
+          Low parser confidence — start the API + inference worker for Tier 2 quality, or click AI Enhance.
         </p>
       ) : null}
 

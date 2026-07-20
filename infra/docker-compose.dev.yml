@@ -1,0 +1,34 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+
+  inference:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ../apps/inference:/app
+    command: sh -c "pip install -q -r requirements.txt && python worker.py"
+    ports:
+      - '8000:8000'
+    environment:
+      INFERENCE_PORT: '8000'
+      VLLM_ENABLED: '0'
+
+  api:
+    image: node:20-alpine
+    working_dir: /repo
+    volumes:
+      - ..:/repo
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @animagen/scene-schema build && pnpm --filter @animagen/parser build && pnpm --filter @animagen/api dev"
+    ports:
+      - '3001:3001'
+    environment:
+      PORT: '3001'
+      REDIS_URL: redis://redis:6379
+      INFERENCE_URL: http://inference:8000
+      CORS_ORIGIN: http://localhost:3000
+    depends_on:
+      - redis
+      - inference

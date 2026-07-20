@@ -1,12 +1,13 @@
 # Animagen Inference Worker (Phase 5)
 #
-# Self-hosted vLLM worker for Tier 2 SceneSpec generation.
-# Consumes jobs from Redis Stream / BullMQ.
+# Dev mode (default): heuristic Tier 2 enhancement — no GPU required.
+# Production: set VLLM_ENABLED=1 and run vLLM separately.
 
 fastapi>=0.115.0
 uvicorn[standard]>=0.32.0
 pydantic>=2.9.0
 redis>=5.1.0
 
-# vLLM installed separately on GPU nodes:
-# pip install vllm>=0.6.0
+# Optional — only when VLLM_ENABLED=1:
+# openai>=1.50.0
+# vllm>=0.6.0  # install on GPU nodes separately
