@@ -2,6 +2,7 @@
 
 import { OrbitControls } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Bloom, EffectComposer } from '@react-three/postprocessing';
 import { buildSceneFromSpec, type SceneBuildResult } from '@animagen/engine';
 import type { SceneSpec } from '@animagen/scene-schema';
 import { useEffect, useRef } from 'react';
@@ -71,6 +72,14 @@ function SceneContent({
   return (
     <>
       <group ref={groupRef} />
+      <EffectComposer multisampling={0}>
+        <Bloom
+          intensity={spec.environment === 'underwater' ? 0.55 : 0.35}
+          luminanceThreshold={0.15}
+          luminanceSmoothing={0.85}
+          mipmapBlur
+        />
+      </EffectComposer>
       {orbitMode ? <OrbitControls makeDefault /> : null}
     </>
   );
@@ -84,7 +93,7 @@ export function SceneCanvas({ spec, isPlaying, orbitMode, playbackKey }: SceneCa
       shadows
       className="h-full w-full rounded-lg bg-black"
       camera={{ position: [0, 8, 18], fov: 55 }}
-      gl={{ preserveDrawingBuffer: true }}
+      gl={{ preserveDrawingBuffer: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
     >
       <SceneContent
         spec={spec}

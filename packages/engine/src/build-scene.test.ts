@@ -46,6 +46,26 @@ describe('buildSceneFromSpec', () => {
     dispose();
   });
 
+  it('builds underwater dragon swim with bubble trail', () => {
+    const spec = createDefaultSceneSpec({
+      prompt: 'a dragon swimming underwater with bubbles',
+      seed: 42,
+      subjects: [{ type: 'dragon', color: 'gold', name: 'dragon' }],
+      environment: 'underwater',
+      animations: [{ target: 'dragon', motion: 'swim', speed: 1, path: 'circle' }],
+      camera: { movement: 'follow', duration: 15, target: 'dragon' },
+      effects: ['bubbles'],
+    });
+    const { scene, update, dispose } = buildSceneFromSpec(spec);
+    let hasTrail = false;
+    scene.traverse((obj) => {
+      if (obj.name === 'effect-bubble-trail') hasTrail = true;
+    });
+    expect(hasTrail).toBe(true);
+    for (let i = 0; i < 30; i++) update(0.05);
+    dispose();
+  });
+
   it('supports all subject types', () => {
     for (const type of ALL_SUBJECT_TYPES) {
       const spec = createDefaultSceneSpec({

@@ -1,9 +1,10 @@
 import type { SceneSpec } from '@animagen/scene-schema';
 import * as THREE from 'three';
-import { setupSubjectAnimation, updateAnimatedSubjects } from './animation/index.js';
+import { setupSubjectAnimation, updateAnimatedSubjects, type MotionContext } from './animation/index.js';
 import type { AnimatedSubject } from './animation/index.js';
 import { createCamera, createCameraController } from './camera/index.js';
 import { buildEnvironment } from './environments/index.js';
+import { buildBubbleTrail } from './effects/bubble-trail.js';
 import { buildEffects } from './effects/index.js';
 import { applyLightingToScene, buildLighting } from './lighting.js';
 import { SeededRandom } from './rng.js';
@@ -32,6 +33,13 @@ export function buildSceneFromSpec(spec: SceneSpec, options: SceneBuildOptions =
   const lighting = buildLighting(spec.lighting);
   applyLightingToScene(scene, lighting);
 
+  if (spec.environment === 'underwater') {
+    scene.background = new THREE.Color(0x001a33);
+    scene.fog = new THREE.FogExp2(0x003355, 0.04);
+  }
+
+  const motionCtx: MotionContext = { environment: spec.environment };
+
   const env = buildEnvironment(spec.environment, rng);
   scene.add(env.group);
   if (env.update) updaters.push((delta, el) => env.update!(el));
@@ -45,6 +53,9 @@ export function buildSceneFromSpec(spec: SceneSpec, options: SceneBuildOptions =
   const animated: AnimatedSubject[] = [];
   spec.subjects.forEach((subjectSpec, index) => {
     const subject = buildSubject({ spec: subjectSpec, rng, index });
+    if (spec.environment === 'underwater') {
+      subject.position.y = -1.5 + index * 0.3;
+    }
     scene.add(subject);
 
     const anims = spec.animations.filter(
@@ -56,10 +67,21 @@ export function buildSceneFromSpec(spec: SceneSpec, options: SceneBuildOptions =
 
     if (anims.length > 0) {
       for (const animSpec of anims) {
-        animated.push(setupSubjectAnimation(subject, animSpec));
+        animated.push(setupSubjectAnimation(subject, animSpec, motionCtx));
+        if (animSpec.motion === 'swim' && spec.environment === 'underwater') {
+          const trail = buildBubbleTrail(subject, rng);
+          scene.add(trail.object);
+          updaters.push((delta) => trail.update(delta));
+        }
       }
     } else if (index === 0 && spec.animations.length > 0) {
-      animated.push(setupSubjectAnimation(subject, spec.animations[0]!));
+      const animSpec = spec.animations[0]!;
+      animated.push(setupSubjectAnimation(subject, animSpec, motionCtx));
+      if (animSpec.motion === 'swim' && spec.environment === 'underwater') {
+        const trail = buildBubbleTrail(subject, rng);
+        scene.add(trail.object);
+        updaters.push((delta) => trail.update(delta));
+      }
     }
   });
 
@@ -68,7 +90,7 @@ export function buildSceneFromSpec(spec: SceneSpec, options: SceneBuildOptions =
 
   const update = (delta: number) => {
     elapsed += delta;
-    updateAnimatedSubjects(animated, delta, elapsed);
+    updateAnimatedSubjects(animated, delta, elapsed, motionCtx);
     for (const fn of updaters) fn(delta, elapsed);
     camCtrl.update(delta, elapsed, scene);
   };
