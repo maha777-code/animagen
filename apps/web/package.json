@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@animagen/director": "workspace:*",
     "@animagen/engine": "workspace:*",
     "@animagen/parser": "workspace:*",
     "@animagen/scene-schema": "workspace:*",

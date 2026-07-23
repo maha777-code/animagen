@@ -1,0 +1,14 @@
+# Animagen LTX-2 render worker (Tier 3 cinematic export)
+#
+# Dev mode (default): validates requests, returns compiled job metadata.
+# Production: set LTX_ENABLED=1 and install torch + diffusers with GPU.
+
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+python-multipart>=0.0.9
+
+# Optional — only when LTX_ENABLED=1:
+# torch>=2.7.0
+# diffusers>=0.33.0
+# accelerate>=1.2.0

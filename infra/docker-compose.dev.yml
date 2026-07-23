@@ -21,14 +21,28 @@ services:
     working_dir: /repo
     volumes:
       - ..:/repo
-    command: sh -c "corepack enable && pnpm install && pnpm --filter @animagen/scene-schema build && pnpm --filter @animagen/parser build && pnpm --filter @animagen/api dev"
+    command: sh -c "corepack enable && pnpm install && pnpm --filter @animagen/scene-schema build && pnpm --filter @animagen/parser build && pnpm --filter @animagen/director build && pnpm --filter @animagen/api dev"
     ports:
       - '3001:3001'
     environment:
       PORT: '3001'
       REDIS_URL: redis://redis:6379
       INFERENCE_URL: http://inference:8000
+      LTX_WORKER_URL: http://ltx-worker:8010
       CORS_ORIGIN: http://localhost:3000
     depends_on:
       - redis
       - inference
+      - ltx-worker
+
+  ltx-worker:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes:
+      - ../apps/ltx-worker:/app
+    command: sh -c "pip install -q -r requirements.txt && python worker.py"
+    ports:
+      - '8010:8010'
+    environment:
+      LTX_PORT: '8010'
+      LTX_ENABLED: '0'
